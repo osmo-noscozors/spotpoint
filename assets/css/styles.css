@@ -217,3 +217,9 @@ html, body, body *{
 }
 .mini-ctrl{ right:var(--hudTopRightOffset) !important; }
 .gm-svpc{ right:calc(var(--hudTopRightOffset) + var(--pegmanGap)) !important; }
+
+@media (max-width: 720px){
+  .screen-frame{
+    display: none !important;
+  }
+}

@@ -1,10 +1,30 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Google Maps – Game</title>
+  <meta name="google-site-verification" content="4rMQqpf4rbsXFEEB0im8VpX39ou0impiE-5Y-_lXmUc" />
+
+  <!-- Optimized Title -->
+  <title>SpotPoint – Free Online Geography Game with Google Maps</title>
+
+  <!-- SEO Meta -->
+  <meta name="description" content="SpotPoint is a free interactive geography game using Google Maps. Test your knowledge by guessing countries, flags, and cities around the world." />
+  <meta name="keywords" content="geography game, flag quiz, Google Maps game, SpotPoint, learn geography, world countries, guess flags, city quiz" />
+  <meta name="author" content="Osmo Noscozors" />
+
+  <!-- Open Graph (Facebook, LinkedIn) -->
+  <meta property="og:title" content="SpotPoint – Online Geography Game" />
+  <meta property="og:description" content="Guess countries, flags, and cities on Google Maps. Improve your geography knowledge while having fun!" />
+  <meta property="og:url" content="https://osmo-noscozors.github.io/spotpoint/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://flagcdn.com/w320/fr.png" />
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SpotPoint – Geography Game" />
+  <meta name="twitter:description" content="Test your knowledge: countries, flags, and cities with Google Maps." />
+  <meta name="twitter:image" content="https://flagcdn.com/w320/fr.png" />
 
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3CLRPPGY16"></script>
@@ -15,7 +35,7 @@
     gtag('config', 'G-3CLRPPGY16');
   </script>
 
-  <!-- Space Grotesk (variable, 300–700) -->
+  <!-- Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
@@ -23,7 +43,7 @@
   <!-- Title overlay -->
   <style>
     .site-title{
-      position:fixed; top:10px; left:55px;
+      position:fixed; top:-12px; left:55px;
       z-index:10000; pointer-events:none;
       font-weight:900; font-size:clamp(18px, 3.2vw, 36px); letter-spacing:.08em;
       color:#fff; text-shadow:0 2px 12px rgba(0,0,0,.55);
@@ -44,83 +64,102 @@
   <link rel="dns-prefetch" href="https://flagcdn.com">
 </head>
 <body>
-  <!-- Nom du site (en haut gauche) -->
-  <div class="site-title" aria-hidden="true">SPOTPOINT</div>
+  <!-- Website name -->
+  <header>
+    <h1 class="site-title">SPOTPOINT</h1>
+  </header>
 
-  <div id="map"></div>
+  <!-- Map -->
+  <main>
+    <div id="map"></div>
 
-  <!-- HUD bas-centre -->
-  <div class="hud" role="region" aria-label="Game panel">
-    <div class="panel stack-rows" id="gameDock">
-      <div class="row header" role="heading" aria-level="1">
-        <div class="target" aria-live="polite">
-          <img id="flagImg" class="flag" alt="Target flag" decoding="async" fetchpriority="low" />
-          <span id="targetName" class="target-name">…</span>
-        </div>
-      </div>
+    <!-- SEO visible text -->
+    <section class="intro" style="max-width:800px;margin:40px auto;color:#fff;padding:0 20px;text-align:center;">
+      <h2>Interactive Geography Game</h2>
+      <p>
+        Welcome to <strong>SpotPoint</strong>, a free online game built on <strong>Google Maps</strong> 
+        to test your knowledge of <em>world geography</em>. Guess the <strong>countries</strong>, 
+        their <strong>flags</strong>, and their <strong>cities</strong> directly on the map.
+      </p>
+      <p>
+        Select a continent, choose your game mode (country name, flag, or city), and try to find the correct answer.  
+        SpotPoint is the perfect way to <strong>learn geography while having fun</strong>.
+      </p>
+    </section>
 
-      <div class="row stats">
-        <div class="meta">
-          <span id="scopeStats" class="pill">World — Countries: 0 / 0</span>
-          <span class="pill" id="attemptsPill">Attempts: 3 · Correct: 0</span>
+    <!-- HUD bottom center -->
+    <div class="hud" role="region" aria-label="Game panel">
+      <div class="panel stack-rows" id="gameDock">
+        <div class="row header" role="heading" aria-level="2">
+          <div class="target" aria-live="polite">
+            <img id="flagImg" class="flag" alt="Flag to guess" decoding="async" fetchpriority="low" />
+            <span id="targetName" class="target-name">…</span>
+          </div>
         </div>
-      </div>
 
-      <div class="row controls-row" aria-label="Filters and actions">
-        <div class="ctrl">
-          <label for="continentSelect">Continent</label>
-          <select id="continentSelect">
-            <option value="ALL">All</option>
-            <option value="Africa">Africa</option>
-            <option value="Europe">Europe</option>
-            <option value="Asia">Asia</option>
-            <option value="North America">North America</option>
-            <option value="South America">South America</option>
-            <option value="Oceania">Oceania</option>
-            <option value="Antarctica">Antarctica</option>
-          </select>
+        <div class="row stats">
+          <div class="meta">
+            <span id="scopeStats" class="pill">World — Countries: 0 / 0</span>
+            <span class="pill" id="attemptsPill">Attempts: 3 · Correct: 0</span>
+          </div>
         </div>
-        <div class="ctrl">
-          <label for="modeSelect">Mode</label>
-          <select id="modeSelect">
-            <option value="name">Country — Name</option>
-            <option value="flag">Country — Flag</option>
-            <option value="city">City</option>
-          </select>
-        </div>
-        <div class="ctrl">
-          <label for="hideIslandsSelect">Hide islands</label>
-          <select id="hideIslandsSelect">
-            <option value="yes" selected>Yes</option>
-            <option value="no">No</option>
-          </select>
-        </div>
-        <div class="btns">
-          <button id="resetBtn" class="ghost">Reset view</button>
-          <button id="nextBtn" class="primary">Next</button>
+
+        <div class="row controls-row" aria-label="Filters and actions">
+          <div class="ctrl">
+            <label for="continentSelect">Continent</label>
+            <select id="continentSelect">
+              <option value="ALL">All</option>
+              <option value="Africa">Africa</option>
+              <option value="Europe">Europe</option>
+              <option value="Asia">Asia</option>
+              <option value="North America">North America</option>
+              <option value="South America">South America</option>
+              <option value="Oceania">Oceania</option>
+              <option value="Antarctica">Antarctica</option>
+            </select>
+          </div>
+          <div class="ctrl">
+            <label for="modeSelect">Mode</label>
+            <select id="modeSelect">
+              <option value="name">Country — Name</option>
+              <option value="flag">Country — Flag</option>
+              <option value="city">City</option>
+            </select>
+          </div>
+          <div class="ctrl">
+            <label for="hideIslandsSelect">Hide islands</label>
+            <select id="hideIslandsSelect">
+              <option value="yes" selected>Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+          <div class="btns">
+            <button id="resetBtn" class="ghost">Reset view</button>
+            <button id="nextBtn" class="primary">Next</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="screen-flash" id="screenFlash"></div>
+    <div class="screen-flash" id="screenFlash"></div>
 
-  <!-- Zone haut-droite : Reset + Aide (texte des contrôles) -->
-  <div class="mini-ctrl" role="group" aria-label="Controls">
-    <button id="btnReset">Reset view</button>
+    <!-- Top right controls -->
+    <div class="mini-ctrl" role="group" aria-label="Controls">
+      <button id="btnReset">Reset view</button>
+    </div>
 
-  </div>
+    <!-- Crosshair + distance -->
+    <div id="aim" class="aim-overlay" aria-hidden="true">
+      <div class="aim-line v"></div>
+      <div class="aim-line h"></div>
+      <div class="aim-dot"></div>
+    </div>
+    <div id="distanceDialog" role="dialog" aria-live="polite" aria-label="Distance" class="distance-dialog"></div>
 
-  <!-- Crosshair + distance -->
-  <div id="aim" class="aim-overlay" aria-hidden="true">
-    <div class="aim-line v"></div>
-    <div class="aim-line h"></div>
-    <div class="aim-dot"></div>
-  </div>
-  <div id="distanceDialog" role="dialog" aria-live="polite" aria-label="Distance" class="distance-dialog"></div>
+    <div class="screen-frame" aria-hidden="true"></div>
+  </main>
 
-  <div class="screen-frame" aria-hidden="true"></div>
-
+  <!-- Scripts -->
   <script type="module" src="assets/js/main.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC4b_9PoE6XnGaAzT0fMylxYE1lT8c1AJE&v=weekly&callback=initMap&loading=async" defer></script>
 </body>

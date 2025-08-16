@@ -213,7 +213,7 @@ html, body, body *{
 /* 3) Décaler le Reset et Pegman plus vers la gauche tout en gardant Pegman à gauche du Reset */
 :root{
   --hudTopRightOffset: 60px; /* augmentez pour aller plus à gauche */
-  --pegmanGap: 95px;          /* conserve l'écart actuel entre Pegman et Reset */
+  --pegmanGap: 110px;          /* conserve l'écart actuel entre Pegman et Reset */
 }
 .mini-ctrl{ right:var(--hudTopRightOffset) !important; }
 .gm-svpc{ right:calc(var(--hudTopRightOffset) + var(--pegmanGap)) !important; }

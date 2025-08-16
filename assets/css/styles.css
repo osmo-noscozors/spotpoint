@@ -1,4 +1,3 @@
-/* assets/css/styles.css */
 :root{
   --panel:rgba(10,10,12,.75);
   --panel-border:rgba(255,255,255,.14);
@@ -6,8 +5,19 @@
   --accent:#ff8a2a;
   --ok:#19c37d; --ko:#f55;
   --crosshair-core:#ffffff;
+
+  /* desktop offsets (conservés) */
+  --hudTopRightOffset: 60px;
+  --pegmanGap: 110px;
 }
 
+/* Mobile specific pegman gap override (used in media query) */
+:root{
+  --mobileTopRight: 6px;      /* +4px vers la gauche */
+  --pegmanGapMobile: 44px;    /* gap entre Reset et Pegman sur mobile */
+}
+
+/* Visual overlay */
 body::after{
   content:"";
   position:fixed; inset:0; z-index:7000; pointer-events:none;
@@ -48,7 +58,6 @@ html, body {
 #map .gm-style .gm-style-mtc, #map .gm-style .gm-control-active,
 .gm-svpc{ cursor:auto !important; }
 
-/* No transforms to avoid degrading 3D */
 #map .gm-style, #map .gm-style > div, #map .gm-style img { backface-visibility:hidden; }
 
 /* HUD */
@@ -117,8 +126,8 @@ button[disabled]{ opacity:.5; cursor:not-allowed }
 }
 .help-card{
   pointer-events:auto;
-  background:rgba(0,0,0,.75);  /* fond sombre pour lisibilité */
-  color:#fff;                  /* texte blanc, au 1er plan */
+  background:rgba(0,0,0,.75);
+  color:#fff;
   border:1px solid var(--panel-border);
   border-radius:12px;
   padding:12px 14px;
@@ -127,19 +136,20 @@ button[disabled]{ opacity:.5; cursor:not-allowed }
   max-width:320px;
 }
 
-/* Pegman : transparent + calé à gauche du bouton Reset (ajusté dynamiquement en JS) */
+/* Pegman : à gauche du bouton Reset */
 .gm-svpc{
   position:fixed !important;
   top:12px !important;
-  left:auto !important;             /* force ignore left */
-  right:96px !important;            /* valeur par défaut (sera écrasée en JS) */
-  background:transparent !important;
+  left:auto !important;
+  right:calc(var(--hudTopRightOffset) + var(--pegmanGap)) !important;
+  background-color:transparent !important;      /* ne pas écraser background-image */
   box-shadow:none !important;
   border:none !important;
   z-index:10001 !important;
 }
+/* ne pas utiliser "background:" ici */
 .gm-svpc *, .gm-style .gm-svpc, .gm-style .gm-svpc *{
-  background:transparent !important;
+  background-color:transparent !important;
   box-shadow:none !important;
   border:none !important;
 }
@@ -189,8 +199,55 @@ button[disabled]{ opacity:.5; cursor:not-allowed }
   .ctrl{ min-width:calc(50% - 6px); }
   .btns{ width:100%; justify-content:stretch; }
   .btns > *{ flex:1 1 auto; }
+
+  /* Header mobile */
+  header{
+    position: fixed;
+    top: 10px;
+    left: 12px;
+    z-index: 10002;
+    pointer-events: none;
+  }
+  .site-title{
+    position: fixed !important;
+    top: 12px !important;
+    left: 24px !important;
+    font-size: 25px !important;
+    margin: 0 !important;
+    transform: none !important;
+    z-index: 10003 !important;
+    pointer-events: none !important;
+  }
+
+  /* Boutons en haut droite, base */
+  .mini-ctrl{
+    position: fixed !important;
+    right: 6px !important;                 /* +4px */
+    top: 12px !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    z-index: 10004 !important;
+  }
+
+  /* Pegman à gauche du Reset sur mobile */
+  .gm-svpc{
+    position: fixed !important;
+    top: 12px !important;
+    right: calc(6px + 44px) !important;    /* +4px */
+    z-index: 10005 !important;
+  }
+
+  .mini-ctrl button{
+    margin-right: 8px;
+  }
+
+  /* Hide screen frame on small screens */
+  .screen-frame{
+    display: none !important;
+  }
 }
 
+/* Prevent user-select across UI */
 html, body, body *{
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -198,28 +255,47 @@ html, body, body *{
   user-select: none;
 }
 
-/* === AJOUTER DANS assets/css/styles.css === */
+/* === AJUSTEMENTS FINALS === */
 
 /* 1) Cacher le bouton "Reset view" du panneau bas */
 #resetBtn{ display:none !important; }
 
-/* 2) Donner au Reset (haut-droite) le style du bouton Next */
+/* 2) Style du Reset (haut-droite) */
 #btnReset{
   background:var(--accent) !important;
   border-color:var(--accent) !important;
   color:#111 !important;
 }
 
-/* 3) Décaler le Reset et Pegman plus vers la gauche tout en gardant Pegman à gauche du Reset */
-:root{
-  --hudTopRightOffset: 60px; /* augmentez pour aller plus à gauche */
-  --pegmanGap: 110px;          /* conserve l'écart actuel entre Pegman et Reset */
+/* 3) Desktop: offsets variables */
+@media (min-width: 721px){
+  .mini-ctrl{ right:var(--hudTopRightOffset) !important; left:auto !important; }
+  .gm-svpc{ right:calc(var(--hudTopRightOffset) + var(--pegmanGap)) !important; left:auto !important; }
 }
-.mini-ctrl{ right:var(--hudTopRightOffset) !important; }
-.gm-svpc{ right:calc(var(--hudTopRightOffset) + var(--pegmanGap)) !important; }
 
+/* 4) Mobile: épinglage extrême droite avec safe-area */
 @media (max-width: 720px){
-  .screen-frame{
-    display: none !important;
+  :root{
+    --hudTopRightOffset: var(--mobileTopRight);
+    --pegmanGap: var(--pegmanGapMobile);
   }
+  .mini-ctrl{
+    right: 6px !important;  /* Reset reste collé au bord droit */
+    top: 12px !important;
+  }
+  .gm-svpc{
+    position: fixed !important;
+    top: 12px !important;
+    left: auto !important;
+    right: auto !important;   /* pas de valeur ici, le JS la pose */
+    z-index: 10005 !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
+
+/* 5) Masquer le cadre sur petits écrans */
+@media (max-width: 720px){
+  .screen-frame{ display:none !important; }
 }

@@ -489,19 +489,24 @@ window.initMap = async function initMap(){
   map.addListener('idle', ()=>{ isZooming = false; suspendHover = false; maybeRunHeavyUpdate(); });
 
   /* ---------------- Positionnement Pegman à gauche du Reset ---------------- */
-  function placePegman() {
-    const peg = document.querySelector('.gm-svpc');
-    const btn = document.getElementById('btnReset');
-    if (!peg || !btn) return;
-    const r = btn.getBoundingClientRect();
-    const right = Math.max(12, window.innerWidth - r.left + 8); // 8px d’espace
-    peg.style.position = 'fixed';
-    peg.style.top = '12px';
-    peg.style.left = 'auto';
-    peg.style.right = right + 'px';
-    peg.style.background = 'transparent';
-    peg.style.zIndex = 10001;
-  }
+function placePegman() {
+  const peg = document.querySelector('.gm-svpc');
+  const btn = document.getElementById('btnReset');
+  if (!peg || !btn) return;
+
+  const GAP = 10; // px d'écart entre Pegman et le bouton Reset
+  const r = btn.getBoundingClientRect();
+
+  // distance depuis le bord droit jusqu'au bord gauche du bouton + gap
+  const right = Math.max(6, window.innerWidth - r.left + GAP);
+
+  peg.style.setProperty('position', 'fixed', 'important');
+  peg.style.setProperty('top', '12px', 'important');
+  peg.style.setProperty('left', 'auto', 'important');
+  peg.style.setProperty('right', right + 'px', 'important'); // Pegman à gauche de Reset
+  peg.style.setProperty('z-index', '10005', 'important');
+}
+
   const pegObs = new MutationObserver(placePegman);
   pegObs.observe(document.body, { childList:true, subtree:true });
   window.addEventListener('resize', placePegman);

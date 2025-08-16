@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-
 Sitemap: https://osmo-noscozors.github.io/spotpoint/sitemap.xml

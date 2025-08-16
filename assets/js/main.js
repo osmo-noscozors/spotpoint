@@ -635,7 +635,7 @@ window.initMap = async function initMap(){
   }
 
   function pickNextTarget(){
-    locked=false; nextBtn.disabled=true;
+    locked=false; nextBtn.disabled=false;
     if(mode==='city'){
       clearPins();
       const next = pickRandomCity();

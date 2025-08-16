@@ -1,0 +1,105 @@
+<!-- assets/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Google Maps – Game</title>
+
+  <link rel="stylesheet" href="assets/css/styles.css" fetchpriority="high" />
+  <link rel="modulepreload" href="assets/js/main.js">
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js">
+
+  <link rel="preconnect" href="https://maps.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://maps.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://flagcdn.com" crossorigin>
+  <link rel="dns-prefetch" href="https://maps.googleapis.com">
+  <link rel="dns-prefetch" href="https://maps.gstatic.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://flagcdn.com">
+</head>
+<body>
+  <div id="map"></div>
+
+  <!-- HUD bottom-center -->
+  <div class="hud" role="region" aria-label="Game panel">
+    <div class="panel stack-rows" id="gameDock">
+      <!-- Target -->
+      <div class="row header" role="heading" aria-level="1">
+        <div class="target" aria-live="polite">
+          <img id="flagImg" class="flag" alt="Target flag" decoding="async" fetchpriority="low" />
+          <span id="targetName" class="target-name">…</span>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="row stats">
+        <div class="meta">
+          <span id="scopeStats" class="pill">World — Countries: 0 / 0</span>
+          <span class="pill" id="attemptsPill">Attempts: 3 · Correct: 0</span>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="row controls-row" aria-label="Filters and actions">
+        <div class="ctrl">
+          <label for="continentSelect">Continent</label>
+          <select id="continentSelect">
+            <option value="ALL">All</option>
+            <option value="Africa">Africa</option>
+            <option value="Europe">Europe</option>
+            <option value="Asia">Asia</option>
+            <option value="North America">North America</option>
+            <option value="South America">South America</option>
+            <option value="Oceania">Oceania</option>
+            <option value="Antarctica">Antarctica</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label for="modeSelect">Mode</label>
+          <select id="modeSelect">
+            <option value="name">Country — Name</option>
+            <option value="flag">Country — Flag</option>
+            <option value="city">City</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label for="hideIslandsSelect">Hide islands</label>
+          <select id="hideIslandsSelect">
+            <option value="yes" selected>Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+        <div class="btns">
+          <button id="resetBtn" class="ghost">Reset</button>
+          <button id="nextBtn" class="primary">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen-flash" id="screenFlash"></div>
+
+  <!-- Mini controls -->
+  <div class="mini-ctrl" role="group" aria-label="Controls">
+    <button id="btnReset">Reset</button>
+  </div>
+
+  <!-- Crosshair overlay -->
+  <div id="aim" class="aim-overlay" aria-hidden="true">
+    <div class="aim-line v"></div>
+    <div class="aim-line h"></div>
+    <div class="aim-dot"></div>
+  </div>
+
+  <!-- Distance text as dialog (no bubble) -->
+  <div id="distanceDialog" role="dialog" aria-live="polite" aria-label="Distance" class="distance-dialog"></div>
+
+  <!-- Foreground white frame -->
+  <div class="screen-frame" aria-hidden="true"></div>
+
+  <script type="module" src="assets/js/main.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC4b_9PoE6XnGaAzT0fMylxYE1lT8c1AJE&v=weekly&callback=initMap&loading=async" defer></script>
+</body>
+</html>

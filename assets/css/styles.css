@@ -34,11 +34,19 @@ body::after{
 /* Base */
 html, body {
   height:100%; margin:0; background:#000; color:var(--ink);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  font-family: "Space Grotesk", sans-serif;
+  font-optical-sizing:auto;
+  font-weight:400;
   overscroll-behavior: none;
 }
 #map { position:fixed; inset:0; width:100vw; height:100vh; touch-action:none; }
+
+/* curseur masqué sur carte, visible sur contrôles */
 #map, #map .gm-style, #map .gm-style * { cursor: none !important; }
+#map .gm-style button, #map .gm-style input, #map .gm-style select,
+#map .gm-style .gm-bundled-control, #map .gm-style .gm-fullscreen-control,
+#map .gm-style .gm-style-mtc, #map .gm-style .gm-control-active,
+.gm-svpc{ cursor:auto !important; }
 
 /* No transforms to avoid degrading 3D */
 #map .gm-style, #map .gm-style > div, #map .gm-style img { backface-visibility:hidden; }
@@ -97,12 +105,43 @@ button.ghost{ background:rgba(255,138,42,.10) }
 button[disabled]{ opacity:.5; cursor:not-allowed }
 .btns{ display:flex; gap:8px; }
 
-/* Mini controls */
-.mini-ctrl{ position:fixed; right:12px; top:12px; z-index:6000; }
+/* Mini controls + Aide (en haut à droite) */
+.mini-ctrl{
+  position:fixed; right:12px; top:12px; z-index:10000;
+  display:flex; flex-direction:column; align-items:flex-end; gap:8px;
+}
 .mini-ctrl button{
   background:rgba(255,255,255,.06); color:var(--ink);
   border:1px solid var(--panel-border); padding:8px 12px;
-  border-radius:10px; cursor:pointer;
+  border-radius:10px; cursor:pointer; align-self:flex-end;
+}
+.help-card{
+  pointer-events:auto;
+  background:rgba(0,0,0,.75);  /* fond sombre pour lisibilité */
+  color:#fff;                  /* texte blanc, au 1er plan */
+  border:1px solid var(--panel-border);
+  border-radius:12px;
+  padding:12px 14px;
+  font-size:13px; line-height:1.4;
+  box-shadow:0 6px 24px rgba(0,0,0,.35);
+  max-width:320px;
+}
+
+/* Pegman : transparent + calé à gauche du bouton Reset (ajusté dynamiquement en JS) */
+.gm-svpc{
+  position:fixed !important;
+  top:12px !important;
+  left:auto !important;             /* force ignore left */
+  right:96px !important;            /* valeur par défaut (sera écrasée en JS) */
+  background:transparent !important;
+  box-shadow:none !important;
+  border:none !important;
+  z-index:10001 !important;
+}
+.gm-svpc *, .gm-style .gm-svpc, .gm-style .gm-svpc *{
+  background:transparent !important;
+  box-shadow:none !important;
+  border:none !important;
 }
 
 /* Flash */
@@ -126,7 +165,7 @@ button[disabled]{ opacity:.5; cursor:not-allowed }
 .aim-dot::before{ width:2px; height:18px; transform:translate(-50%,-50%); }
 .aim-dot::after { width:18px; height:2px; transform:translate(-50%,-50%); }
 
-/* Distance dialog: big white text, no bubble */
+/* Distance dialog */
 .distance-dialog{
   position:fixed;
   left:0; top:0; transform:translate(-50%,-100%);
@@ -151,3 +190,30 @@ button[disabled]{ opacity:.5; cursor:not-allowed }
   .btns{ width:100%; justify-content:stretch; }
   .btns > *{ flex:1 1 auto; }
 }
+
+html, body, body *{
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* === AJOUTER DANS assets/css/styles.css === */
+
+/* 1) Cacher le bouton "Reset view" du panneau bas */
+#resetBtn{ display:none !important; }
+
+/* 2) Donner au Reset (haut-droite) le style du bouton Next */
+#btnReset{
+  background:var(--accent) !important;
+  border-color:var(--accent) !important;
+  color:#111 !important;
+}
+
+/* 3) Décaler le Reset et Pegman plus vers la gauche tout en gardant Pegman à gauche du Reset */
+:root{
+  --hudTopRightOffset: 60px; /* augmentez pour aller plus à gauche */
+  --pegmanGap: 84px;          /* conserve l'écart actuel entre Pegman et Reset */
+}
+.mini-ctrl{ right:var(--hudTopRightOffset) !important; }
+.gm-svpc{ right:calc(var(--hudTopRightOffset) + var(--pegmanGap)) !important; }

@@ -1,18 +1,35 @@
-<!-- assets/index.html -->
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Google Maps – Game</title>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-3CLRPPGY16"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-3CLRPPGY16');
-</script>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3CLRPPGY16"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-3CLRPPGY16');
+  </script>
+
+  <!-- Space Grotesk (variable, 300–700) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+
+  <!-- Title overlay -->
+  <style>
+    .site-title{
+      position:fixed; top:10px; left:55px;
+      z-index:10000; pointer-events:none;
+      font-weight:900; font-size:clamp(18px, 3.2vw, 36px); letter-spacing:.08em;
+      color:#fff; text-shadow:0 2px 12px rgba(0,0,0,.55);
+    }
+  </style>
+
   <link rel="stylesheet" href="assets/css/styles.css" fetchpriority="high" />
   <link rel="modulepreload" href="assets/js/main.js">
   <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js">
@@ -27,12 +44,14 @@
   <link rel="dns-prefetch" href="https://flagcdn.com">
 </head>
 <body>
+  <!-- Nom du site (en haut gauche) -->
+  <div class="site-title" aria-hidden="true">SPOTPOINT</div>
+
   <div id="map"></div>
 
-  <!-- HUD bottom-center -->
+  <!-- HUD bas-centre -->
   <div class="hud" role="region" aria-label="Game panel">
     <div class="panel stack-rows" id="gameDock">
-      <!-- Target -->
       <div class="row header" role="heading" aria-level="1">
         <div class="target" aria-live="polite">
           <img id="flagImg" class="flag" alt="Target flag" decoding="async" fetchpriority="low" />
@@ -40,7 +59,6 @@
         </div>
       </div>
 
-      <!-- Stats -->
       <div class="row stats">
         <div class="meta">
           <span id="scopeStats" class="pill">World — Countries: 0 / 0</span>
@@ -48,7 +66,6 @@
         </div>
       </div>
 
-      <!-- Controls -->
       <div class="row controls-row" aria-label="Filters and actions">
         <div class="ctrl">
           <label for="continentSelect">Continent</label>
@@ -79,7 +96,7 @@
           </select>
         </div>
         <div class="btns">
-          <button id="resetBtn" class="ghost">Reset</button>
+          <button id="resetBtn" class="ghost">Reset view</button>
           <button id="nextBtn" class="primary">Next</button>
         </div>
       </div>
@@ -88,22 +105,20 @@
 
   <div class="screen-flash" id="screenFlash"></div>
 
-  <!-- Mini controls -->
+  <!-- Zone haut-droite : Reset + Aide (texte des contrôles) -->
   <div class="mini-ctrl" role="group" aria-label="Controls">
     <button id="btnReset">Reset</button>
+
   </div>
 
-  <!-- Crosshair overlay -->
+  <!-- Crosshair + distance -->
   <div id="aim" class="aim-overlay" aria-hidden="true">
     <div class="aim-line v"></div>
     <div class="aim-line h"></div>
     <div class="aim-dot"></div>
   </div>
-
-  <!-- Distance text as dialog (no bubble) -->
   <div id="distanceDialog" role="dialog" aria-live="polite" aria-label="Distance" class="distance-dialog"></div>
 
-  <!-- Foreground white frame -->
   <div class="screen-frame" aria-hidden="true"></div>
 
   <script type="module" src="assets/js/main.js"></script>

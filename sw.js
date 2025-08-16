@@ -1,6 +1,6 @@
 // sw.js
 /* Service Worker renforcé: caches versionnés + allowlist d'origines */
-const VERSION = 'v11-hardened';
+const VERSION = 'v12-hardened';
 const PRECACHE = `precache-${VERSION}`;
 const RUNTIME_DATA = `data-${VERSION}`;
 const RUNTIME_ASSETS = `assets-${VERSION}`;

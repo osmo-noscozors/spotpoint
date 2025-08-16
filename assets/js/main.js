@@ -101,17 +101,11 @@ function filterIslandsFC(fc){
 }
 
 /* ---------------- Island countries list (ISO2) ---------------- */
-// Pays sans frontière terrestre. Ajustable selon ton besoin.
 const ISLAND_ISO2 = new Set([
-  // Europe
   "IS","MT","CY",
-  // Océanie
-  "AU","NZ","NR","PW","FM","MH","KI","TV","TO","WS","VU","SB","FJ","PG", // PG a une frontière avec ID, retire-le si tu veux l’inclure
-  // Asie
+  "AU","NZ","NR","PW","FM","MH","KI","TV","TO","WS","VU","SB","FJ","PG",
   "JP","PH","LK","MV","SG","BH","TW",
-  // Afrique (îles)
   "MG","MU","SC","KM","CV","ST",
-  // Caraïbes / Amériques
   "CU","JM","BS","BB","TT","AG","KN","DM","LC","VC","GD"
 ]);
 
@@ -149,7 +143,7 @@ window.initMap = async function initMap(){
   const foundCities = new Set(), failedCities = new Set();
   let target = null, hoveredId = null;
 
-  // défaut: Yes -> on masque les îles
+  // défaut: masquer les îles
   let hideIslands = true;
   if (hideIslandsSel) hideIslandsSel.value = 'yes';
 
@@ -207,7 +201,7 @@ window.initMap = async function initMap(){
         const inScope = (currentContinent==='ALL') || getContinentCached(f)===currentContinent;
         if(!inScope) return;
         const iso = iso2Cached(f); if(!iso) return;
-        if(hideIslands && ISLAND_ISO2.has(iso)) return; // exclure du total
+        if(hideIslands && ISLAND_ISO2.has(iso)) return;
         total++;
         if(foundCountries.has(iso) || failedCountries.has(iso)) done++;
       });
@@ -358,7 +352,7 @@ window.initMap = async function initMap(){
     countryData.forEach(f=>{
       if(!isFeatureInScope(f)) return;
       const iso = iso2Cached(f); if(!iso) return;
-      if(hideIslands && ISLAND_ISO2.has(iso)) return; // exclure du pool
+      if(hideIslands && ISLAND_ISO2.has(iso)) return;
       if(foundCountries.has(iso) || failedCountries.has(iso)) return;
       list.push(f);
     });
@@ -384,7 +378,11 @@ window.initMap = async function initMap(){
   map = new google.maps.Map(document.getElementById("map"), {
     center: START.center, zoom: START.zoom, tilt: START.tilt, heading: START.heading,
     mapId: MAP_ID,
-    gestureHandling: "greedy", disableDefaultUI: true, clickableIcons: false,
+    gestureHandling: "greedy",
+    disableDefaultUI: true,
+    clickableIcons: false,
+    streetViewControl: true,
+    streetViewControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
     draggableCursor: "none", draggingCursor: "none",
     maxZoom: 22,
     restriction: { latLngBounds:{ north:85, south:-85, west:-179.999, east:179.999 }, strictBounds:true }
@@ -431,6 +429,25 @@ window.initMap = async function initMap(){
   map.addListener('dragend',   ()=>{ isDragging = false; suspendHover = false; requestHeavyUpdate(); });
   map.addListener('zoom_changed', ()=>{ isZooming = true; suspendHover = true; requestHeavyUpdate(); });
   map.addListener('idle', ()=>{ isZooming = false; suspendHover = false; maybeRunHeavyUpdate(); });
+
+  /* ---------------- Positionnement Pegman à gauche du Reset ---------------- */
+  function placePegman() {
+    const peg = document.querySelector('.gm-svpc');
+    const btn = document.getElementById('btnReset');
+    if (!peg || !btn) return;
+    const r = btn.getBoundingClientRect();
+    const right = Math.max(12, window.innerWidth - r.left + 8); // 8px d’espace
+    peg.style.position = 'fixed';
+    peg.style.top = '12px';
+    peg.style.left = 'auto';
+    peg.style.right = right + 'px';
+    peg.style.background = 'transparent';
+    peg.style.zIndex = 10001;
+  }
+  const pegObs = new MutationObserver(placePegman);
+  pegObs.observe(document.body, { childList:true, subtree:true });
+  window.addEventListener('resize', placePegman);
+  setTimeout(placePegman, 300);
 
   /* ---------------- GAME UI ---------------- */
   function setModeUI(){
@@ -584,7 +601,6 @@ window.initMap = async function initMap(){
 
   modeSelect.addEventListener('change', ()=>{ setModeUI(); pickNextTarget(); }, {passive:true});
 
-  // Yes/No îles -> reconstruit la couche et met à jour pool + stats
   hideIslandsSel.addEventListener('change', async ()=>{
     hideIslands = hideIslandsSel.value === 'yes';
     countryLayers["110m"] = null;
@@ -592,7 +608,6 @@ window.initMap = async function initMap(){
     await useCountryLOD((map.getZoom()||1) >=3 ? "50m" : "110m");
     _poolCacheKey = null; _poolCacheTS = 0;
     updateStats(); updateAttempts();
-    // Si la cible actuelle est une île et qu'on masque, on tire une nouvelle cible
     if (hideIslands && target && target.type==='country') {
       const iso = iso2Cached(target.feature);
       if (iso && ISLAND_ISO2.has(iso)) pickNextTarget();
@@ -616,6 +631,7 @@ window.initMap = async function initMap(){
   document.getElementById('btnReset').onclick = ()=>{
     map.setCenter(FR_CENTER); map.setZoom(FR_ZOOM);
     map.setHeading(START.heading); map.setTilt(START.tilt);
+    placePegman(); // réaligner Pegman si la largeur du bouton change
   };
 
   setModeUI();

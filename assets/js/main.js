@@ -12,6 +12,64 @@ import {
   strokeForZoom, lodForZoom
 } from "./utils/geo-helpers.js";
 
+/* ---------------- Soft sounds (Web Audio, no files) ---------------- */
+const Sound = (() => {
+  let ctx;
+  function ac() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+  function env(c, t0, a=0.01, h=0.08, r=0.15, peak=0.03) {
+    const g = c.createGain();
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(peak, t0 + a);
+    g.gain.setValueAtTime(peak, t0 + a + h);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + a + h + r);
+    return g;
+  }
+// Remplace uniquement la fonction ok() dans Sound par ceci (carillon très doux)
+function ok() {
+  const c = ac(), t0 = c.currentTime;
+
+  // enveloppe douce + léger low-pass pour adoucir le timbre
+  const g = c.createGain();
+  g.gain.setValueAtTime(0, t0);
+  g.gain.linearRampToValueAtTime(0.015, t0 + 0.015);         // attaque douce
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.45);    // longue décroissance
+  const lp = c.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.setValueAtTime(2400, t0);
+  lp.Q.setValueAtTime(0.7, t0);
+  g.connect(lp).connect(c.destination);
+
+  // accord C5–E5–G5 en sine, très discret
+  const freqs = [523.25, 659.25, 783.99];
+  freqs.forEach((f, i) => {
+    const o = c.createOscillator();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(f, t0 + i*0.015);
+    o.detune.setValueAtTime(4, t0 + i*0.015);                // très léger battement
+    o.connect(g);
+    o.start(t0 + i*0.015);
+    o.stop(t0 + 0.34 + i*0.02);
+  });
+}
+
+  function ko() {              // erreur: glissando descendant, doux
+    const c = ac(), t0 = c.currentTime;
+    const g = env(c, t0, 0.01, 0.05, 0.18, 0.025);
+    g.connect(c.destination);
+    const o = c.createOscillator();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(260, t0);
+    o.frequency.linearRampToValueAtTime(180, t0 + 0.22);
+    o.connect(g);
+    o.start(t0); o.stop(t0 + 0.25);
+  }
+  return { ok, ko };
+})();
+
 /* ---------------- Service Worker ---------------- */
 (async function registerSW(){
   if (!('serviceWorker' in navigator)) return;
@@ -478,6 +536,7 @@ window.initMap = async function initMap(){
 
     const correct = target && target.type==='country' && iso2Cached(target.feature) === isoClick;
     if(correct){
+      Sound.ok(); // ajouté: son succès
       locked=true;
       foundCountries.add(isoClick);
       countryData.setStyle(countryStyle);
@@ -487,6 +546,7 @@ window.initMap = async function initMap(){
       setTimeout(pickNextTarget, 450);
     }else{
       attemptsLeft = Math.max(0, attemptsLeft-1); updateAttempts();
+      Sound.ko(); // ajouté: son erreur
       countryData.overrideStyle(f, { fillColor: COLOR_KO, fillOpacity: 0.35, clickable: true, zIndex: 960 });
       setTimeout(()=> countryData.revertStyle(f), 180);
       flashScreen();
@@ -540,6 +600,7 @@ window.initMap = async function initMap(){
 
     const success = dkm <= 50;
     if(success){
+      Sound.ok(); // ajouté: son succès
       locked=true; foundCities.add(target.id);
       const pinOk = new PinElement({ background: COLOR_OK, borderColor:'#d7ffd6', glyphColor:'#fff' });
       if(answerPin) answerPin.map=null;
@@ -547,7 +608,9 @@ window.initMap = async function initMap(){
       targetNameEl.textContent=`${target.name} ✔ (±${dkm} km)`; updateStats(); updateAttempts();
       setTimeout(pickNextTarget, 600);
     }else{
-      attemptsLeft=Math.max(0, attemptsLeft-1); updateAttempts(); flashScreen();
+      attemptsLeft=Math.max(0, attemptsLeft-1); updateAttempts();
+      Sound.ko(); // ajouté: son erreur
+      flashScreen();
       targetNameEl.textContent=`${target.name} — ${dkm} km away`;
       if(attemptsLeft===0){
         locked=true; failedCities.add(target.id);
